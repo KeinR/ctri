@@ -105,6 +105,7 @@ int main(int argc, char **argv) {
                     targetInt = &MSAASamples;
                 } else {
                     std::cerr << PSIG "Ignoring unknown flag \"" << argv[i] << '\"' << '\n';
+                    continue;
                 }
                 if (i+1 < argc) {
                     i++;
@@ -251,6 +252,9 @@ unsigned int computePolygon(int n, float thickness) {
 
     const unsigned int maxVertices = n * 2;
 
+    vertices.reserve(maxVertices * 2);
+    indices.reserve(n * 6);
+
     float rot = 2 * PI / n;
     float rotation = 0;
     for (int i = 0; i < n; i++) {
@@ -332,8 +336,8 @@ bool streq(const char *a, const char *b) {
 
 void printHelp() {
     std::cout <<
-R"(ctri - "Circle Triangle"
-Animation to demonstrate how a non-convex polygon of isocilies triangles can come close to forming a circle.
+R"(ctri - "Circle TRIangle"
+Animation to demonstrate how an inscribed regular polygon can come close to forming a circle as its sides approach infinity.
 
 Usage:
 ctri [flags [values]]
@@ -346,6 +350,9 @@ Options:
     --pstart   [integer]  Change the starting side count of the polygon (does not effect `--pmax`)
     --samples  [integer]  Change the number of samples to take when doing multisampling (higher values result in smoother graphics)
     -step                 Change the animation to instead add a side when the SPACEBAR is pressed. Causes `--interval` to have to effect.
+
+number: A float
+integer: An int. You can prefix with "0x" for hexidecimal and "0" for octal
 
 Source code, license information, and bug reports at <https://github.com/KeinR/ctri/>
 )";
