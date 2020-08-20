@@ -7,6 +7,7 @@
 #include <cstring>
 #include <exception>
 #include <cassert>
+#include <string>
 
 #define GLFW_DLL 1
 #include <glad/glad.h>

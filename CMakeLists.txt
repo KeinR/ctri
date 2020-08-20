@@ -1,10 +1,25 @@
 cmake_minimum_required(VERSION 3.0)
 project(ctri VERSION 1.0 LANGUAGES CXX C)
 
-set(CMAKE_CXX_STANDARD 17)
+option(RELEASE "Whether the program should be build for release" ON)
+
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall")
+
+if (RELEASE)
+    if (MSVC)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /O2")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -s")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -s")
+    endif()
+else()
+    if (NOT MSVC)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall")
+    endif()
+endif()
 
 set(sources src/main.cpp extern/glad/glad.c)
 
