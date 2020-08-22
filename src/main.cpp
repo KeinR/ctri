@@ -261,9 +261,8 @@ unsigned int computePolygon(int n, float thickness) {
     for (int i = 0; i < n; i++) {
         float x = std::cos(rotation);
         float y = std::sin(rotation);
-        float t = std::abs(x) + std::abs(y);
-        float ix = x - (x / t) * thickness;
-        float iy = y - (y / t) * thickness;
+        float ix = x - x * thickness;
+        float iy = y - y * thickness;
         unsigned int ofs = vertices.size() / 2;
         vertices.insert(vertices.end(), {
             x, y,
