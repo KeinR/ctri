@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(ctri VERSION 1.0 LANGUAGES CXX C)
+project(ctri VERSION 1.0.1 LANGUAGES CXX C)
 
 option(RELEASE "Whether the program should be build for release" ON)
 

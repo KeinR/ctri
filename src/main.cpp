@@ -86,10 +86,8 @@ int main(int argc, char **argv) {
                 param += 2;
                 int *targetInt = nullptr;
                 float *targetFloat = nullptr;
-                if (streq(param, "help")) {
-                    printHelp();
-                    return 0;
-                } else if (streq(param, "pwidth")) {
+                // No, a hashmap is quite franky overkill
+                if (streq(param, "pwidth")) {
                     targetFloat = &lineWidth;
                 } else if (streq(param, "cwidth")) {
                     targetFloat = &circleThickness;
@@ -112,14 +110,14 @@ int main(int argc, char **argv) {
                     const char *value = argv[i];
                     if (targetInt != nullptr) {
                         try {
-                            *targetInt = std::stoi(param, 0, 0);
+                            *targetInt = std::stoi(value, 0, 0);
                         } catch (std::exception &e) {
                             std::cerr << PSIG "Expected \"" << value << "\" to be an integer: " << e.what() << '\n';
                         }
                     } else {
                         assert(targetFloat != nullptr);
                         try {
-                            *targetFloat = std::stof(param);
+                            *targetFloat = std::stof(value);
                         } catch (std::exception &e) {
                             std::cerr << PSIG "Expected \"" << value << "\" to be a number: " << e.what() << '\n';
                         }
@@ -129,7 +127,10 @@ int main(int argc, char **argv) {
                 }
             } else {
                 param += 1;
-                if (streq(param, "step")) {
+                if (streq(param, "help")) {
+                    printHelp();
+                    return 0;
+                } else if (streq(param, "step")) {
                     step = true;
                 } else {
                     std::cerr << PSIG "Ignoring unknown flag \"" << argv[i] << '\"' << '\n';
@@ -260,8 +261,9 @@ unsigned int computePolygon(int n, float thickness) {
     for (int i = 0; i < n; i++) {
         float x = std::cos(rotation);
         float y = std::sin(rotation);
-        float ix = x - x * thickness;
-        float iy = y - y * thickness;
+        float t = std::abs(x) + std::abs(y);
+        float ix = x - (x / t) * thickness;
+        float iy = y - (y / t) * thickness;
         unsigned int ofs = vertices.size() / 2;
         vertices.insert(vertices.end(), {
             x, y,
@@ -342,6 +344,7 @@ Animation to demonstrate how an inscribed regular polygon can come close to form
 Usage:
 ctri [flags [values]]
 Options:
+    -help                 Prints this message and exits
     --pwidth   [number]   Change the line width of the polygon
     --cwidth   [number]   Change the line width of the circle
     --cres     [integer]  Change the resolution of the circle (how many triangles)
