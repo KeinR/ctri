@@ -338,7 +338,8 @@ bool streq(const char *a, const char *b) {
 void printHelp() {
     std::cout <<
 R"(ctri - "Circle TRIangle"
-Animation to demonstrate how an inscribed regular polygon can come close to forming a circle as its sides approach infinity.
+Animation to demonstrate how an inscribed regular polygon can come
+close to forming a circle as its sides approach infinity.
 
 Usage:
 ctri [flags [values]]
@@ -346,17 +347,27 @@ Options:
     -help                 Prints this message and exits
     --pwidth   [number]   Change the line width of the polygon
     --cwidth   [number]   Change the line width of the circle
-    --cres     [integer]  Change the resolution of the circle (how many triangles)
-    --interval [number]   Change the number to seconds to wait untl the next frame (animation)
-    --pmax     [integer]  Change the number of sides at which the animation will reset
-    --pstart   [integer]  Change the starting side count of the polygon (does not effect `--pmax`)
-    --samples  [integer]  Change the number of samples to take when doing multisampling (higher values result in smoother graphics)
-    -step                 Change the animation to instead add a side when the SPACEBAR is pressed. Causes `--interval` to have to effect.
+    --cres     [integer]  Change the resolution of the circle (how
+                          many triangles)
+    --interval [number]   Change the number to seconds to wait untl
+                          the next frame (animation)
+    --pmax     [integer]  Change the number of sides at which the
+                          animation will reset
+    --pstart   [integer]  Change the starting side count of the
+                          polygon (does not effect `--pmax`)
+    --samples  [integer]  Change the number of samples to take when
+                          doing multisampling (higher values result
+                          in smoother graphics)
+    -step                 Change the animation to instead add a side
+                          when the SPACEBAR is pressed. Causes
+                          `--interval` to have to effect.
 
-number: A float
-integer: An int. You can prefix with "0x" for hexidecimal and "0" for octal
+number:  A float
+integer: An int. You can prefix with "0x" for hexidecimal and "0" for
+         octal
 
-Source code, license information, and bug reports at <https://github.com/KeinR/ctri/>
+Source code, license information, and bug reports at
+<https://github.com/KeinR/ctri/>
 )";
 }
 
