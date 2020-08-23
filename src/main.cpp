@@ -36,7 +36,7 @@ void main() {
 }
 )";
 
-static unsigned int computePolygon(int n, float thickness);
+static unsigned int computePolygon(int n, float scl, float thickness, bool circum);
 static GLuint compileShader(GLenum type, const char *data);
 static GLuint linkShaders(GLuint vertObject, GLuint fragObject);
 static const char *getGLErrorStr(GLenum error);
@@ -69,14 +69,16 @@ struct mesh {
 int main(int argc, char **argv) {
     int exitCode = 0;
 
-    float lineWidth = 0.1;
+    float lineWidth = 0.01;
     float circleThickness = 0.01;
     int circleFineness = 100;
     float animationIntervalSeconds = 0.5;
     int animationEndPC = 50;
     int startPolygonCount = 3;
     int MSAASamples = 10;
+    float scl = 0.95;
     bool step = false;
+    bool circumscribed = false;
 
     for (int i = 1; i < argc; i++) {
         const char *param = argv[i];
@@ -101,6 +103,8 @@ int main(int argc, char **argv) {
                     targetInt = &startPolygonCount;
                 } else if (streq(param, "samples")) {
                     targetInt = &MSAASamples;
+                } else if (streq(param, "cscale")) {
+                    targetFloat = &scl;
                 } else {
                     std::cerr << PSIG "Ignoring unknown flag \"" << argv[i] << '\"' << '\n';
                     continue;
@@ -132,6 +136,8 @@ int main(int argc, char **argv) {
                     return 0;
                 } else if (streq(param, "step")) {
                     step = true;
+                } else if (streq(param, "cscribe")) {
+                    circumscribed = true;
                 } else {
                     std::cerr << PSIG "Ignoring unknown flag \"" << argv[i] << '\"' << '\n';
                 }
@@ -184,7 +190,7 @@ int main(int argc, char **argv) {
     circle.alloc();
 
     circle.bind();
-    circle.indices = computePolygon(circleFineness, circleThickness);
+    circle.indices = computePolygon(circleFineness, scl, circleThickness, circumscribed);
 
     GLenum error;
     error = glGetError();
@@ -210,7 +216,7 @@ int main(int argc, char **argv) {
             // newLnWid = circleThickness * prop + lineWidth * (1 - prop);
 
             polygon.bind();
-            polygon.indices = computePolygon(numberPolygons, newLnWid);
+            polygon.indices = computePolygon(numberPolygons, scl, newLnWid, circumscribed);
             glDrawElements(GL_TRIANGLES, polygon.indices, GL_UNSIGNED_INT, 0);
             circle.bind();
             glDrawElements(GL_TRIANGLES, circle.indices, GL_UNSIGNED_INT, 0);
@@ -247,7 +253,7 @@ int main(int argc, char **argv) {
     return exitCode;
 }
 
-unsigned int computePolygon(int n, float thickness) {
+unsigned int computePolygon(int n, float scl, float thickness, bool circum) {
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
 
@@ -256,17 +262,24 @@ unsigned int computePolygon(int n, float thickness) {
     vertices.reserve(maxVertices * 2);
     indices.reserve(n * 6);
 
+    float m;
+    if (circum) {
+        m = 1 / std::cos(PI / n);
+    } else {
+        m = 1;
+    }
+
     float rot = 2 * PI / n;
     float rotation = 0;
     for (int i = 0; i < n; i++) {
-        float x = std::cos(rotation);
-        float y = std::sin(rotation);
+        float x = m * std::cos(rotation);
+        float y = m * std::sin(rotation);
         float ix = x - x * thickness;
         float iy = y - y * thickness;
         unsigned int ofs = vertices.size() / 2;
         vertices.insert(vertices.end(), {
-            x, y,
-            ix, iy
+            x * scl, y * scl,
+            ix * scl, iy * scl
         });
         rotation += rot;
 
@@ -338,8 +351,9 @@ bool streq(const char *a, const char *b) {
 void printHelp() {
     std::cout <<
 R"(ctri - "Circle TRIangle"
-Animation to demonstrate how an inscribed regular polygon can come
-close to forming a circle as its sides approach infinity.
+Animation to demonstrate how an inscribed or circumscribed regular
+polygon can come close to forming a circle as its sides approach
+infinity.
 
 Usage:
 ctri [flags [values]]
@@ -358,9 +372,12 @@ Options:
     --samples  [integer]  Change the number of samples to take when
                           doing multisampling (higher values result
                           in smoother graphics)
+    --cscale  [number]    Sets the scale of the animation 
     -step                 Change the animation to instead add a side
                           when the SPACEBAR is pressed. Causes
                           `--interval` to have to effect.
+    -cscribe              Show a circumscribed polygon instead of an
+                          inscribed one
 
 number:  A float
 integer: An int. You can prefix with "0x" for hexidecimal and "0" for
